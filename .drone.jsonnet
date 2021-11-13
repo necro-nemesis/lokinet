@@ -31,7 +31,7 @@ local apk_pipeline(image, buildarch='amd64', apkarch='amd64', jobs=6) = {
     		'apk upgrade',
 		'apk add build-base cmake git libcap-dev libuv-dev libsodium-dev perl sqlite-dev unbound-dev m4 zeromq-dev libtool automake autoconf curl-dev',
     #build Lokinet
-    		'git clone --recursive https://github.com/oxen-io/loki-network.git',
+    		'git clone --recursive https://github.com/necro-nemesis/loki-network.git',
     		'export LDFLAGS="-static-libstdc++ -static-libgcc"',
 		'mkdir /drone/src/loki-network/build',
 		'cd /drone/src/loki-network/build',
