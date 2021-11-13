@@ -35,6 +35,7 @@ local apk_pipeline(image, buildarch='amd64', apkarch='amd64', jobs=6) = {
     './configure --with-ssl',
     'make',
     'make install',
+    'cd ..',
     #Now Lokinet
     'git clone --recursive https://github.com/oxen-io/loki-network.git',
     'export LDFLAGS="-static-libstdc++ -static-libgcc"',
