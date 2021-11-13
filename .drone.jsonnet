@@ -47,9 +47,9 @@ local apk_pipeline(image, buildarch='amd64', apkarch='amd64', jobs=6) = {
     #build ipkg package
     		'mkdir /drone/src/openwrt',
 		'cd ../contrib/openwrt/',
-		'./ipkg-build.sh /drone/src/lokinet/contrib/openwrt/base/ /drone/src/openwrt/',
+		'./ipkg-build.sh /drone/src/lokinet/contrib/openwrt/base/ /drone/src/openwrt/' + apkarch ,
 		'echo "openwrt package directory contents"',
-		'ls -la /drone/src/openwrt/'
+		'ls -la /drone/src/openwrt/ + apkarch'
             ]
         }
     ]
@@ -58,7 +58,7 @@ local apk_pipeline(image, buildarch='amd64', apkarch='amd64', jobs=6) = {
 [
     apk_pipeline(distro_docker),
     #apk_pipeline("i386/" + distro_docker, buildarch='amd64', apkarch='i386'),
-    apk_pipeline("arm64v8/" + distro_docker, buildarch='arm64', apkarch="arm64", jobs=4),
+    #apk_pipeline("arm64v8/" + distro_docker, buildarch='arm64', apkarch="arm64", jobs=4),
     #apk_pipeline("arm32v7/" + distro_docker, buildarch='arm64', apkarch="armhf", jobs=4),
 
 ]
