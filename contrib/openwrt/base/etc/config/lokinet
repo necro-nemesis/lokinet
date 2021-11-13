@@ -1,0 +1,10 @@
+
+config Address
+	option Addr 'null'
+
+config Key 'Key'
+	option Key 'null'
+
+config Enabled 'Enable'
+	option Enabled '0'
+

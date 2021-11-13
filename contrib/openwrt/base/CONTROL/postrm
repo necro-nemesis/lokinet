@@ -1,0 +1,6 @@
+#!/bin/sh
+cp /etc/firewall.bak /etc/firewall.user
+uci del_list dhcp.@dnsmasq[0].server='127.3.2.1'
+uci del_list dhcp.@dnsmasq[0].server='/loki/127.3.2.1'
+uci commit dhcp
+rm -r /root/.lokinet
