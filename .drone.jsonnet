@@ -28,23 +28,23 @@ local apk_pipeline(image, buildarch='amd64', apkarch='amd64', jobs=6) = {
                 #'cp debian/deb.loki.network.gpg /etc/apt/trusted.gpg.d',
 		'apk update --quiet',
     #upgrade (may break OpenWrt v19.07 install)
-    		'apk upgrade',
+    		#'apk upgrade',
 		'apk add build-base cmake git libcap-dev libuv-dev libsodium-dev perl sqlite-dev unbound-dev m4 zeromq-dev libtool automake autoconf curl-dev',
     #build Lokinet
-    		'git clone --recursive https://github.com/necro-nemesis/loki-network.git',
+    		'git clone --recursive https://github.com/necro-nemesis/lokinet.git',
     		'export LDFLAGS="-static-libstdc++ -static-libgcc"',
-		'mkdir /drone/src/loki-network/build',
-		'cd /drone/src/loki-network/build',
+		'mkdir /drone/src/lokinet/build',
+		'cd /drone/src/lokinet/build',
 		'cmake .. -DWITH_SETCAP=OFF -DBUILD_STATIC_DEPS=ON -DBUILD_SHARED_LIBS=OFF -DSTATIC_LINK=ON -DNATIVE_BUILD=OFF -DWITH_SYSTEMD=OFF -DWITH_LTO=OFF -DWITH_TESTS=OFF -DWITH_BOOTSTRAP=OFF -DCMAKE_BUILD_TYPE=Release',
 		'make -j' + jobs,
-		'mkdir -p /drone/src/loki-network/build/contents',
-		'make DESTDIR=/drone/src/loki-network/build/contents install',
+		'mkdir -p /drone/src/lokinet/build/contents',
+		'make DESTDIR=/drone/src/lokinet/build/contents install',
     #add built Lokinet binaries to OpenWrt package base files	
-		'cp -r /drone/src/loki-network/build/contents/usr/ /drone/src/loki-network/contrib/openwrt/base/',
+		'cp -r /drone/src/lokinet/build/contents/usr/ /drone/src/lokinet/contrib/openwrt/base/',
     #build ipkg package
     		'mkdir /drone/src/openwrt',
 		'cd ../contrib/openwrt/',
-		'./ipkg-build.sh /drone/src/loki-network/contrib/openwrt/base/ /drone/src/openwrt/',
+		'./ipkg-build.sh /drone/src/lokinet/contrib/openwrt/base/ /drone/src/openwrt/',
 		'echo "openwrt package directory contents"',
 		'ls -la /drone/src/openwrt/'
             ]
