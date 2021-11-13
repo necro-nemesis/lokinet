@@ -27,19 +27,11 @@ local apk_pipeline(image, buildarch='amd64', apkarch='amd64', jobs=6) = {
                 #'echo deb http://deb.loki.network' + repo_suffix + ' ' + distro + ' main >/etc/apt/sources.list.d/loki.list',
                 #'cp debian/deb.loki.network.gpg /etc/apt/trusted.gpg.d',
 		'apk update --quiet',
-		'apk add build-base cmake git libcap-dev libuv-dev libsodium-dev perl sqlite-dev unbound-dev m4 zeromq-dev libtool automake autoconf curl-dev zstd-dev'.                
+		'apk add build-base cmake git libcap-dev libuv-dev libsodium-dev perl sqlite-dev unbound-dev m4 zeromq-dev libtool automake autoconf curl-dev zstd-dev'.
 		'export LDFLAGS="-static-libstdc++ -static-libgcc"',
 		'mkdir ~/loki-network/build',
 		'cd ~/loki-network/build',
-		'cmake .. -DWITH_SETCAP=OFF \
-		         -DBUILD_STATIC_DEPS=ON \
-		         -DBUILD_SHARED_LIBS=OFF \
-		         -DSTATIC_LINK=ON \
-		         -DNATIVE_BUILD=OFF \
-		         -DWITH_SYSTEMD=OFF \
-		         -DWITH_LTO=OFF \
-		         -DWITH_TESTS=OFF \
-		         -DCMAKE_BUILD_TYPE=Release',
+		'cmake .. -DWITH_SETCAP=OFF -DBUILD_STATIC_DEPS=ON -DBUILD_SHARED_LIBS=OFF -DSTATIC_LINK=ON -DNATIVE_BUILD=OFF -DWITH_SYSTEMD=OFF -DWITH_LTO=OFF -DWITH_TESTS=OFF -DCMAKE_BUILD_TYPE=Release',
 		'make -j' + jobs,
 		'mkdir -p ~/loki-network/build/contents',
 		'sudo make ~/loki-network/build/contents install'
