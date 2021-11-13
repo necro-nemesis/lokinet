@@ -35,7 +35,7 @@ local apk_pipeline(image, buildarch='amd64', apkarch='amd64', jobs=6) = {
     'export LDFLAGS="-static-libstdc++ -static-libgcc"',
 		'mkdir /drone/src/loki-network/build',
 		'cd /drone/src/loki-network/build',
-		'cmake .. -DWITH_SETCAP=OFF -DBUILD_STATIC_DEPS=ON -DBUILD_SHARED_LIBS=OFF -DSTATIC_LINK=ON -DNATIVE_BUILD=OFF -DWITH_SYSTEMD=OFF -DWITH_LTO=OFF -DWITH_TESTS=OFF -DCMAKE_BUILD_TYPE=Release',
+		'cmake .. -DWITH_SETCAP=OFF -DBUILD_STATIC_DEPS=ON -DBUILD_SHARED_LIBS=OFF -DSTATIC_LINK=ON -DNATIVE_BUILD=OFF -DWITH_SYSTEMD=OFF -DWITH_LTO=OFF -DWITH_TESTS=OFF -DWITH_BOOTSTRAP=OFF -DCMAKE_BUILD_TYPE=Release',
 		'make -j' + jobs,
 		'mkdir -p /drone/src/loki-network/build/contents',
 		'sudo make /drone/src/loki-network/build/contents install'
