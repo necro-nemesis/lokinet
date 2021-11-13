@@ -45,4 +45,5 @@ local apk_pipeline(image, buildarch='amd64', apkarch='amd64', jobs=6) = {
     #apk_pipeline("i386/" + distro_docker, buildarch='amd64', debarch='i386'),
     #apk_pipeline("arm64v8/" + distro_docker, buildarch='arm64', debarch="arm64", jobs=4),
     #apk_pipeline("arm32v7/" + distro_docker, buildarch='arm64', debarch="armhf", jobs=4),
+    #git on atom sucks
 ]
