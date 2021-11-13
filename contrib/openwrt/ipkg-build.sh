@@ -140,20 +140,20 @@ mkdir $tmp_dir
 
 echo $CONTROL > $tmp_dir/tarX
 # Preserve permissions (-p) when creating data.tar.gz as non-root user
-( cd $pkg_dir && $TAR $ogargs -X $tmp_dir/tarX --format=posix --sort=name -cpf -  --mtime="$TIMESTAMP" . | $GZIP -n - > $tmp_dir/data.tar.gz )
+( cd $pkg_dir && $TAR $ogargs -X $tmp_dir/tarX -H gnu --sort=name -cpf -  --mtime="$TIMESTAMP" . | $GZIP -n - > $tmp_dir/data.tar.gz )
 
 installed_size=`stat -c "%s" $tmp_dir/data.tar.gz`
 sed -i -e "s/^Installed-Size: .*/Installed-Size: $installed_size/" \
 	$pkg_dir/$CONTROL/control
 
-( cd $pkg_dir/$CONTROL && $TAR $ogargs --format=posix --sort=name -cf -  --mtime="$TIMESTAMP" . | $GZIP -n - > $tmp_dir/control.tar.gz )
+( cd $pkg_dir/$CONTROL && $TAR $ogargs -H gnu --sort=name -cf -  --mtime="$TIMESTAMP" . | $GZIP -n - > $tmp_dir/control.tar.gz )
 rm $tmp_dir/tarX
 
 echo "2.0" > $tmp_dir/debian-binary
 
 pkg_file=$dest_dir/${pkg}_${version}_${arch}.ipk
 rm -f $pkg_file
-( cd $tmp_dir && $TAR $ogargs --format=posix --sort=name -cf -  --mtime="$TIMESTAMP" ./debian-binary ./data.tar.gz ./control.tar.gz | $GZIP -n - > $pkg_file )
+( cd $tmp_dir && $TAR $ogargs -H gnu --sort=name -cf -  --mtime="$TIMESTAMP" ./debian-binary ./data.tar.gz ./control.tar.gz | $GZIP -n - > $pkg_file )
 
 rm $tmp_dir/debian-binary $tmp_dir/data.tar.gz $tmp_dir/control.tar.gz
 rmdir $tmp_dir
