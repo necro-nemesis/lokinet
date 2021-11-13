@@ -1,0 +1,2 @@
+Location for mainnet.signed
+Package installer copies file over to .lokinet/bootstrap.signed in root directory.
