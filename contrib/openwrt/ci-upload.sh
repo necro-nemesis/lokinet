@@ -33,7 +33,7 @@ for apk in openwrt/${apkmarch}/*.apk; do
     put+=$'\n'"put $apk $upload_to"
 
     echo -e "\n\n\e[35;1m$apkarch contents:\e[0m"
-    rpm --query --list $apk
+    apk --query --list $apk
 done
 
 # sftp doesn't have any equivalent to mkdir -p, so we have to split the above up into a chain of
