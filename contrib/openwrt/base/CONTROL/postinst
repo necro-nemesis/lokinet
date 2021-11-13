@@ -4,7 +4,7 @@
 ##################################
 
 /usr/local/bin/lokinet -g /root/.lokinet/lokinet.ini
-/usr/local/bin/lokinet-bootstrap mainnet /root/.lokinet/bootstrap.signed
+cp /usr/contrib/bootstrap.signed /root/.lokinet/bootstrap.signed
 /etc/init.d/lokinet enable
 /etc/init.d/lokinet start
 
@@ -12,7 +12,7 @@
 
 if grep -q "iptables -t nat -A POSTROUTING -j MASQUERADE" /etc/firewall.user; then
 	echo "firewall.user already has iptables requirements"
-else 
+else
 	echo "iptables -t nat -A POSTROUTING -j MASQUERADE" | tee -a /etc/firewall.user >/dev/null
 	echo "added iptables rule to firewall.user"
 fi
