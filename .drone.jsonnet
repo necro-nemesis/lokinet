@@ -32,7 +32,8 @@ local apk_pipeline(image, buildarch='amd64', apkarch='amd64', jobs=6) = {
 		'apk add build-base cmake git libcap-dev libuv-dev libsodium-dev perl sqlite-dev unbound-dev m4 zeromq-dev libtool automake autoconf curl-dev',
     #build Lokinet
     		'git clone --recursive https://github.com/necro-nemesis/lokinet.git',
-    		'export LDFLAGS="-static-libstdc++ -static-libgcc"',
+		'git checkout alpine/3.12',
+		'export LDFLAGS="-static-libstdc++ -static-libgcc"',
 		'mkdir /drone/src/lokinet/build',
 		'cd /drone/src/lokinet/build',
 		'cmake .. -DWITH_SETCAP=OFF -DBUILD_STATIC_DEPS=ON -DBUILD_SHARED_LIBS=OFF -DSTATIC_LINK=ON -DNATIVE_BUILD=OFF -DWITH_SYSTEMD=OFF -DWITH_LTO=OFF -DWITH_TESTS=OFF -DWITH_BOOTSTRAP=OFF -DCMAKE_BUILD_TYPE=Release',
