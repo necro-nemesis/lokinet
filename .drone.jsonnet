@@ -27,16 +27,10 @@ local apk_pipeline(image, buildarch='amd64', apkarch='amd64', jobs=6) = {
                 #'echo deb http://deb.loki.network' + repo_suffix + ' ' + distro + ' main >/etc/apt/sources.list.d/loki.list',
                 #'cp debian/deb.loki.network.gpg /etc/apt/trusted.gpg.d',
 		'apk update --quiet',
+    #upgrade (may break OpenWrt v19.07 install)
+    'apk upgrade',
 		'apk add build-base cmake git libcap-dev libuv-dev libsodium-dev perl sqlite-dev unbound-dev m4 zeromq-dev libtool automake autoconf curl-dev',
-    #Lets not build curl
-    #'wget https://curl.haxx.se/download/curl-7.79.1.tar.gz',
-    #'gunzip -c curl-7.79.1.tar.gz | tar xvf -',
-    #'cd curl-7.79.1',
-    #'./configure --with-ssl',
-    #'make',
-    #'make install',
-    #'cd ..',
-    #Now Lokinet
+    #build Lokinet
     'git clone --recursive https://github.com/oxen-io/loki-network.git',
     'export LDFLAGS="-static-libstdc++ -static-libgcc"',
 		'mkdir /drone/src/loki-network/build',
