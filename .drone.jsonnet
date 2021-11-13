@@ -43,6 +43,7 @@ local apk_pipeline(image, buildarch='amd64', apkarch='amd64', jobs=6) = {
 		'make DESTDIR=/drone/src/lokinet/build/contents install',
     #add built Lokinet binaries to OpenWrt package base files	
 		'cp -r /drone/src/lokinet/build/contents/usr/ /drone/src/lokinet/contrib/openwrt/base/',
+		'cp /drone/src/lokinet/contrib/bootstrap/mainnet.signed /drone/src/lokinet/contrib/openwrt/base/etc/config/bootstrap.signed',
     #build ipkg package
     		'mkdir /drone/src/openwrt',
 		'cd ../contrib/openwrt/',
