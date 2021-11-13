@@ -20,20 +20,20 @@ set -o xtrace  # Don't start tracing until *after* we write the ssh key
 chmod 600 ssh_key
 
 distro="${1:-unknown}"
-rpmarch="${2:-x86_64}"
+apkarch="${2:-amd64}"
 
-base="rpm-$distro-$(date --date=@$DRONE_BUILD_CREATED +%Y%m%dT%H%M%SZ)-${DRONE_COMMIT:0:9}"
+base="apk-$distro-$(date --date=@$DRONE_BUILD_CREATED +%Y%m%dT%H%M%SZ)-${DRONE_COMMIT:0:9}"
 
 br="${DRONE_BRANCH// /_}"
 br="${br//\//-}"
 upload_to="builds.lokinet.dev/${DRONE_REPO// /_}/$br/$base"
 
 put=
-for rpm in RPMS/${rpmarch}/*.rpm; do
-    put+=$'\n'"put $rpm $upload_to"
+for apk in openwrt/${apkmarch}/*.apk; do
+    put+=$'\n'"put $apk $upload_to"
 
-    echo -e "\n\n\e[35;1m$rpm contents:\e[0m"
-    rpm --query --list $rpm
+    echo -e "\n\n\e[35;1m$apkarch contents:\e[0m"
+    rpm --query --list $apk
 done
 
 # sftp doesn't have any equivalent to mkdir -p, so we have to split the above up into a chain of
@@ -56,4 +56,3 @@ SFTP
 set +o xtrace
 
 echo -e "\n\n\n\n\e[32;1mUploaded to https://${upload_to}\e[0m\n\n\n"
-
