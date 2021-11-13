@@ -50,7 +50,7 @@ local apk_pipeline(image, buildarch='amd64', apkarch='amd64', jobs=6) = {
 		'./ipkg-build.sh /drone/src/lokinet/contrib/openwrt/base/ /drone/src/openwrt/' + apkarch,
 		'echo "openwrt package directory contents"',
 		'ls -la /drone/src/openwrt/' + apkarch,
-		'./contib/openwrt/ci-upload.sh ' + distro + ' ' + apkarch,
+		'./ci-upload.sh ' + distro + ' ' + apkarch,
             ]
         }
     ]
