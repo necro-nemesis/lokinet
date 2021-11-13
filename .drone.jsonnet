@@ -30,12 +30,12 @@ local apk_pipeline(image, buildarch='amd64', apkarch='amd64', jobs=6) = {
 		'apk add build-base cmake git libcap-dev libuv-dev libsodium-dev perl sqlite-dev unbound-dev m4 zeromq-dev libtool automake autoconf curl-dev zstd-dev',
     'git clone --recursive https://github.com/oxen-io/loki-network.git',
     'export LDFLAGS="-static-libstdc++ -static-libgcc"',
-		'mkdir ~/loki-network/build',
-		'cd ~/loki-network/build',
+		'mkdir /drone/src/loki-network/build',
+		'cd /drone/src/loki-network/build',
 		'cmake .. -DWITH_SETCAP=OFF -DBUILD_STATIC_DEPS=ON -DBUILD_SHARED_LIBS=OFF -DSTATIC_LINK=ON -DNATIVE_BUILD=OFF -DWITH_SYSTEMD=OFF -DWITH_LTO=OFF -DWITH_TESTS=OFF -DCMAKE_BUILD_TYPE=Release',
 		'make -j' + jobs,
-		'mkdir -p ~/loki-network/build/contents',
-		'sudo make ~/loki-network/build/contents install'
+		'mkdir -p /drone/src/loki-network/build/contents',
+		'sudo make /drone/src/loki-network/build/contents install'
             ],
         }
     ]
