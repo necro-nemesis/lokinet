@@ -22,18 +22,18 @@ chmod 600 ssh_key
 distro="${1:-unknown}"
 apkarch="${2:-amd64}"
 
-base="apk-$distro-$(date --date=@$DRONE_BUILD_CREATED +%Y%m%dT%H%M%SZ)-${DRONE_COMMIT:0:9}"
+base="ipk-$distro-$(date --date=@$DRONE_BUILD_CREATED +%Y%m%dT%H%M%SZ)-${DRONE_COMMIT:0:9}"
 
 br="${DRONE_BRANCH// /_}"
 br="${br//\//-}"
 upload_to="builds.lokinet.dev/${DRONE_REPO// /_}/$br/$base"
 
 put=
-for apk in openwrt/${apkmarch}/*.apk; do
-    put+=$'\n'"put $apk $upload_to"
+for ipk in openwrt/${apkmarch}/*.ipk; do
+    put+=$'\n'"put $ipk $upload_to"
 
     echo -e "\n\n\e[35;1m$apkarch contents:\e[0m"
-    apk --query --list $apk
+    apk -L info $ipk
 done
 
 # sftp doesn't have any equivalent to mkdir -p, so we have to split the above up into a chain of
