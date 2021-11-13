@@ -1,6 +1,6 @@
 local distro = "alpine";
 local distro_name = 'Alpine 3.12';
-local distro_docker = 'Alpine:3.12.8';
+local distro_docker = 'alpine:3.12.8';
 
 local repo_suffix = '/staging'; // can be /beta or /staging for non-primary repo deps
 
