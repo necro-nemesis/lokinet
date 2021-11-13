@@ -27,7 +27,7 @@ local apk_pipeline(image, buildarch='amd64', apkarch='amd64', jobs=6) = {
                 #'echo deb http://deb.loki.network' + repo_suffix + ' ' + distro + ' main >/etc/apt/sources.list.d/loki.list',
                 #'cp debian/deb.loki.network.gpg /etc/apt/trusted.gpg.d',
 		'apk update --quiet',
-		'apk add build-base cmake git libcap-dev libuv-dev libsodium-dev perl sqlite-dev unbound-dev m4 zeromq-dev libtool automake autoconf curl-dev zstd-dev'.
+		'apk add build-base cmake git libcap-dev libuv-dev libsodium-dev perl sqlite-dev unbound-dev m4 zeromq-dev libtool automake autoconf curl-dev zstd-dev',
 		'export LDFLAGS="-static-libstdc++ -static-libgcc"',
 		'mkdir ~/loki-network/build',
 		'cd ~/loki-network/build',
