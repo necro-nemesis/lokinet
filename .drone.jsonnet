@@ -28,6 +28,14 @@ local apk_pipeline(image, buildarch='amd64', apkarch='amd64', jobs=6) = {
                 #'cp debian/deb.loki.network.gpg /etc/apt/trusted.gpg.d',
 		'apk update --quiet',
 		'apk add build-base cmake git libcap-dev libuv-dev libsodium-dev perl sqlite-dev unbound-dev m4 zeromq-dev libtool automake autoconf curl-dev zstd-dev',
+    #Lets build curl
+    'wget https://curl.haxx.se/download/curl-7.79.1.tar.gz',
+    'gunzip -c curl-7.79.1.tar.gz | tar xvf -',
+    'cd curl-7.79.1',
+    './configure --with-ssl',
+    'make',
+    'make install',
+    #Now Lokinet
     'git clone --recursive https://github.com/oxen-io/loki-network.git',
     'export LDFLAGS="-static-libstdc++ -static-libgcc"',
 		'mkdir /drone/src/loki-network/build',
