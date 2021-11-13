@@ -29,7 +29,7 @@ local apk_pipeline(image, buildarch='amd64', apkarch='amd64', jobs=6) = {
 		'apk update --quiet',
     #upgrade (may break OpenWrt v19.07 install)
     		#'apk upgrade',
-		'apk add build-base cmake git libcap-dev libuv-dev libsodium-dev perl sqlite-dev unbound-dev m4 zeromq-dev libtool automake autoconf curl-dev',
+		'apk add build-base cmake git libcap-dev libuv-dev libsodium-dev perl sqlite-dev unbound-dev m4 zeromq-dev libtool automake autoconf curl-dev binutils',
     #build Lokinet
     		'git clone --recursive https://github.com/necro-nemesis/lokinet.git',
 		'cd lokinet/',
@@ -58,7 +58,7 @@ local apk_pipeline(image, buildarch='amd64', apkarch='amd64', jobs=6) = {
 [
     apk_pipeline(distro_docker),
     #apk_pipeline("i386/" + distro_docker, buildarch='amd64', apkarch='i386'),
-    apk_pipeline("arm64v8/" + distro_docker, buildarch='arm64', apkarch="arm64", jobs=4),
+    #apk_pipeline("arm64v8/" + distro_docker, buildarch='arm64', apkarch="arm64", jobs=4),
     #apk_pipeline("arm32v7/" + distro_docker, buildarch='arm64', apkarch="armhf", jobs=4),
 
 ]
