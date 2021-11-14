@@ -33,9 +33,6 @@ cd /drone/src/
 put=
 for ipk in openwrt/${apkarch}/*.ipk; do
     put+=$'\n'"put $ipk $upload_to"
-
-    #echo -e '\n\n\e[35;1m'$ipk' contents:\e[0m'
-    #apk -L info $ipk
 done
 
 # sftp doesn't have any equivalent to mkdir -p, so we have to split the above up into a chain of
