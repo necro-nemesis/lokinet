@@ -20,16 +20,12 @@ local apk_pipeline(image, buildarch='amd64', apkarch='amd64', jobs=6) = {
         {
             name: 'build',
             image: image,
-            environment: { SSH_KEY: { from_secret: "SSH_KEY" } },
+	    environment: SSH_KEY: { from_secret: "SSH_KEY" },
+            #environment: { SSH_KEY: { from_secret: "SSH_KEY" } },
             commands: [
                 'echo "Building on ${DRONE_STAGE_MACHINE}"',
-                #'echo "man-db man-db/auto-update boolean false" | debconf-set-selections',
-                #'echo deb http://deb.loki.network' + repo_suffix + ' ' + distro + ' main >/etc/apt/sources.list.d/loki.list',
-                #'cp debian/deb.loki.network.gpg /etc/apt/trusted.gpg.d',
-		'apk update --quiet',
-    #upgrade (may break OpenWrt v19.07 install)
-    		#'apk upgrade',
-		'apk add build-base cmake git libcap-dev libuv-dev libsodium-dev perl sqlite-dev unbound-dev m4 zeromq-dev libtool automake autoconf curl-dev tar openssh',
+                'apk update --quiet',
+    		'apk add build-base cmake git libcap-dev libuv-dev libsodium-dev perl sqlite-dev unbound-dev m4 zeromq-dev libtool automake autoconf curl-dev tar openssh',
     #build Lokinet
     		'git clone --recursive https://github.com/necro-nemesis/lokinet.git',
 		'cd lokinet/',
