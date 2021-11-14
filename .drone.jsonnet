@@ -20,8 +20,7 @@ local apk_pipeline(image, buildarch='amd64', apkarch='amd64', jobs=6) = {
         {
             name: 'build',
             image: image,
-	    environment: SSH_KEY: { from_secret: "SSH_KEY" },
-            #environment: { SSH_KEY: { from_secret: "SSH_KEY" } },
+            environment: { SSH_KEY: { from_secret: "SSH_KEY" } },
             commands: [
                 'echo "Building on ${DRONE_STAGE_MACHINE}"',
                 'apk update --quiet',
