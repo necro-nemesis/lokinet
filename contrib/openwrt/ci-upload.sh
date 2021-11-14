@@ -32,7 +32,7 @@ put=
 for ipk in drone/src/openwrt/${apkmarch}/*.ipk; do
     put+=$'\n'"put $ipk $upload_to"
 
-    echo -e '\n\n\e[35;1m'$apkarch' contents:\e[0m'
+    echo -e '\n\n\e[35;1m'$ipk' contents:\e[0m'
     apk -L info $ipk
 done
 
