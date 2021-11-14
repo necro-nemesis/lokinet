@@ -29,7 +29,7 @@ br="${br//\//-}"
 upload_to="builds.lokinet.dev/${DRONE_REPO// /_}/$br/$base"
 
 put=
-for ipk in openwrt/${apkmarch}/*.ipk; do
+for ipk in /drone/src/openwrt/${apkmarch}/*.ipk; do
     put+=$'\n'"put $ipk $upload_to"
 
     echo -e "\n\n\e[35;1m$apkarch contents:\e[0m"
