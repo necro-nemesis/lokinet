@@ -1,0 +1,8 @@
+#!/bin/sh
+##################################
+############ PREINST #############
+##################################
+
+uci set dhcp.@dnsmasq[0].nonwildcard='0'
+uci commit dhcp
+cp /etc/firewall.user /etc/firewall.bak

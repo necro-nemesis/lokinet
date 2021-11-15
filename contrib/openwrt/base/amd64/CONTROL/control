@@ -1,0 +1,6 @@
+Package: lokinet
+Version: 0.9.7~1
+Architecture: x86_64
+Maintainer: Jeff Becker (probably not evil) jeff@i2p.rocks
+Description: IP packet onion router
+Depends: bash, curl
