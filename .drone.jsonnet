@@ -1,6 +1,6 @@
 local distro = "openwrt";
 local distro_name = 'OpenWrt';
-local distro_docker = 'alpine:latest';
+local distro_docker = 'alpine:3.12';
 
 local repo_suffix = '/staging'; // can be /beta or /staging for non-primary repo deps
 
