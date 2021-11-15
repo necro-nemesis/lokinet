@@ -26,9 +26,6 @@ local apk_pipeline(image, buildarch='amd64', apkarch='amd64', jobs=6) = {
                 'apk update --quiet',
     		'apk add build-base cmake git libcap-dev libuv-dev libsodium-dev perl sqlite-dev unbound-dev m4 zeromq-dev libtool automake autoconf curl-dev tar openssh',
     #build Lokinet
-    		'git clone --recursive https://github.com/necro-nemesis/lokinet.git',
-		'cd lokinet/',
-		'git checkout alpine/3.12',
 		'export LDFLAGS="-static-libstdc++ -static-libgcc"',
 		'mkdir /drone/src/lokinet/build',
 		'cd /drone/src/lokinet/build',
@@ -36,7 +33,7 @@ local apk_pipeline(image, buildarch='amd64', apkarch='amd64', jobs=6) = {
 		'make -j' + jobs,
 		'mkdir -p /drone/src/lokinet/build/contents',
 		'make DESTDIR=/drone/src/lokinet/build/contents install',
-    #add built Lokinet binaries to OpenWrt package base files	
+    #add built Lokinet binaries to OpenWrt package base files
 		'cp -r /drone/src/lokinet/build/contents/usr/ /drone/src/lokinet/contrib/openwrt/base/',
 		'cp /drone/src/lokinet/contrib/bootstrap/mainnet.signed /drone/src/lokinet/contrib/openwrt/base/usr/contrib/bootstrap.signed',
     #build ipkg package
