@@ -31,15 +31,14 @@ local apk_pipeline(image, buildarch='amd64', apkarch='amd64', jobs=6) = {
 		'cd /drone/src/build',
 		'cmake .. -DWITH_SETCAP=OFF -DBUILD_STATIC_DEPS=ON -DBUILD_SHARED_LIBS=OFF -DSTATIC_LINK=ON -DNATIVE_BUILD=OFF -DWITH_SYSTEMD=OFF -DWITH_LTO=OFF -DBUILD_LIBLOKINET=OFF -DWITH_TESTS=OFF -DWITH_BOOTSTRAP=OFF -DCMAKE_BUILD_TYPE=Release',
 		'make -j' + jobs,
-		#'mkdir -p /drone/src/lokinet/build/contents',
 		'make DESTDIR=/drone/src/build/contents install',
     #add built Lokinet binaries to OpenWrt package base files
 		'cp -r /drone/src/build/contents/usr/ /drone/src/contrib/openwrt/base/'+ apkarch,
-		'cp /drone/src/contrib/bootstrap/mainnet.signed /drone/src/contrib/openwrt/base/$apkarch/usr/contrib/bootstrap.signed',
+		'cp /drone/src/contrib/bootstrap/mainnet.signed /drone/src/contrib/openwrt/base/' + apkarch + '/usr/contrib/bootstrap.signed',
     #build ipkg package
     		'mkdir -p /drone/src/openwrt/' + apkarch,
 		'cd ../contrib/openwrt/',
-		'./ipkg-build.sh /drone/src/contrib/openwrt/base/$apkarch /drone/src/openwrt/' + apkarch,
+		'./ipkg-build.sh /drone/src/contrib/openwrt/base/' + apkarch +' /drone/src/openwrt/' + apkarch,
 		'echo "openwrt package directory contents"',
 		'ls -la /drone/src/openwrt/' + apkarch,
 		'./ci-upload.sh ' + distro + ' ' + apkarch,
