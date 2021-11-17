@@ -1,5 +1,5 @@
 Package: lokinet
-Version: 0.9.7~1
+Version: 0.9.8~1
 Architecture: aarch64_generic
 Maintainer: Jeff Becker (probably not evil) jeff@i2p.rocks
 Description: IP packet onion router
