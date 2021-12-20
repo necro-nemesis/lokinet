@@ -1,6 +1,7 @@
 local distro = "openwrt";
 local distro_name = 'OpenWrt';
-local distro_docker = 'alpine:3.12';
+#local distro_docker = 'alpine:3.12';
+local distro_docker = 'alpine:latest';
 
 local repo_suffix = '/staging'; // can be /beta or /staging for non-primary repo deps
 
@@ -50,7 +51,7 @@ local apk_pipeline(image, buildarch='amd64', apkarch='amd64', jobs=6) = {
 [
     apk_pipeline(distro_docker),
     #apk_pipeline("i386/" + distro_docker, buildarch='amd64', apkarch='i386'),
-    apk_pipeline("arm64v8/" + distro_docker, buildarch='arm64', apkarch="arm64", jobs=4),
+    #apk_pipeline("arm64v8/" + distro_docker, buildarch='arm64', apkarch="arm64", jobs=4),
     #apk_pipeline("arm32v7/" + distro_docker, buildarch='arm64', apkarch="armhf", jobs=4),
 
 ]
