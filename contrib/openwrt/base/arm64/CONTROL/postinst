@@ -5,6 +5,7 @@
 
 /usr/local/bin/lokinet -g /root/.lokinet/lokinet.ini
 cp /usr/contrib/bootstrap.signed /root/.lokinet/bootstrap.signed
+cp /usr/contrib/banner /etc/banner
 /etc/init.d/lokinet enable
 /etc/init.d/lokinet start
 
