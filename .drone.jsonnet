@@ -10,7 +10,7 @@ local submodules = {
     commands: ['git fetch --tags', 'git submodule update --init --recursive --depth=1']
 };
 
-local aur_pipeline(image, buildarch='amd64', apkarch='amd64', jobs=6) = {
+local aur_pipeline(image, buildarch='amd64', aurarch='amd64', jobs=6) = {
     kind: 'pipeline',
     type: 'docker',
     name: distro_name + ' (' + aurarch + ')',
@@ -34,8 +34,8 @@ local aur_pipeline(image, buildarch='amd64', apkarch='amd64', jobs=6) = {
 		'mkdir -p /drone/src/archlinux/' + aurarch,
 		'cp /drone/source/build/lokinet*.* /drone/src/archlinux/' + aurarch,
 		'echo "archlinux package directory contents"',
-		'ls -la /drone/src/archlinux/' + apkarch,
-		'./ci-upload.sh ' + distro + ' ' + apkarch,
+		'ls -la /drone/src/archlinux/' + aurarch,
+		'./ci-upload.sh ' + distro + ' ' + aurarch,
             ]
         }
     ]
@@ -43,8 +43,8 @@ local aur_pipeline(image, buildarch='amd64', apkarch='amd64', jobs=6) = {
 
 [
     aur_pipeline(distro_docker),
-    #apk_pipeline("i386/" + distro_docker, buildarch='amd64', apkarch='i386'),
-    #apk_pipeline("arm64v8/" + distro_docker, buildarch='arm64', apkarch="arm64", jobs=4),
-    #apk_pipeline("arm32v7/" + distro_docker, buildarch='arm64', apkarch="armhf", jobs=4),
+    #aur_pipeline("i386/" + distro_docker, buildarch='amd64', aurarch='i386'),
+    #aur_pipeline("arm64v8/" + distro_docker, buildarch='arm64', aurarch="arm64", jobs=4),
+    #aur_pipeline("arm32v7/" + distro_docker, buildarch='arm64', aurarch="armhf", jobs=4),
 
 ]
