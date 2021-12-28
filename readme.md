@@ -23,6 +23,7 @@ Build requirements:
 * C++ 17 capable C++ compiler
 * libuv >= 1.27.0
 * libsodium >= 1.0.18
+* libssl (for lokinet-bootstrap)
 * libcurl (for lokinet-bootstrap)
 * libunbound
 * libzmq
@@ -41,23 +42,15 @@ You can install these using:
     $ sudo apt install lokinet
 
 
-If you are not on a platform supported by the debian packages or if you want to build a dev build, this is the most "portable" way to do it:
+If you want to build from source:
 
-    $ sudo apt install build-essential cmake git libcap-dev pkg-config automake libtool libuv1-dev libsodium-dev libzmq3-dev libcurl4-openssl-dev libevent-dev nettle-dev libunbound-dev libsqlite3-dev
+    $ sudo apt install build-essential cmake git libcap-dev pkg-config automake libtool libuv1-dev libsodium-dev libzmq3-dev libcurl4-openssl-dev libevent-dev nettle-dev libunbound-dev libsqlite3-dev libssl-dev
     $ git clone --recursive https://github.com/oxen-io/lokinet
     $ cd lokinet
     $ mkdir build
     $ cd build
-    $ cmake .. -DBUILD_STATIC_DEPS=ON -DBUILD_SHARED_LIBS=OFF -DSTATIC_LINK=ON -DCMAKE_BUILD_TYPE=Release
-    $ make -j$(nproc)
-    
-If you dont want to do a static build install the dependancies and run:
-
     $ cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF
     $ make -j$(nproc)
-
-install:
-
     $ sudo make install
 
 ### macOS
@@ -96,7 +89,7 @@ build:
     $ cd lokinet
     $ mkdir build
     $ cd build
-    $ cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DSTATIC_LINK=ON -DBUILD_SHARED_DEPS=ON ..
+    $ cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DSTATIC_LINK=ON -DBUILD_STATIC_DEPS=ON ..
     $ make
 
 install (root):
@@ -126,13 +119,3 @@ This requires the binary to have the proper capabilities which is usually set by
 
     $ sudo setcap cap_net_admin,cap_net_bind_service=+eip /usr/local/bin/lokinet
 
-
-## Running on macOS/UNIX/BSD
-
-**YOU HAVE TO RUN AS ROOT**, run using sudo. Elevated privileges are needed to create the virtual tunnel interface.
-
-The macOS installer places the normal binaries (`lokinet` and `lokinet-bootstrap`) in `/usr/local/bin` which should be in your path, so you can easily use the binaries from your terminal. The installer also nukes your previous config and keys and sets up a fresh config and downloads the latest bootstrap seed.
-
-to run, after you create default config:
-
-    $ sudo lokinet
