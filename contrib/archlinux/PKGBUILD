@@ -8,11 +8,7 @@ url="https://lokinet.org"
 license=('GPL3')
 depends=('libuv' 'libsodium' 'curl' 'unbound' 'sqlite' 'jemalloc' 'libsystemd' 'zeromq')
 makedepends=('git' 'cmake' 'pkgconf')
-<<<<<<< HEAD
-conflicts=('lokinet-bin')
-=======
 conflicts=('lokinet' 'lokinet-bin')
->>>>>>> 33ed6109a44d28d79be50f399c0645e9d1ff6cf7
 source=("$pkgname::git+https://github.com/oxen-io/lokinet#branch=makepkg")
 b2sums=('SKIP')
 
@@ -60,8 +56,4 @@ package() {
     install -D -m 644 "$srcdir/$pkgname/contrib/systemd-resolved/lokinet.pkla"            "$pkgdir/var/lib/polkit-1/localauthority/10-vendor.d/lokinet.pkla"
     install -D -m 750 -d "$pkgdir/usr/share/polkit-1/rules.d"
     install -D -m 644 "$srcdir/$pkgname/contrib/systemd-resolved/lokinet.rules"           "$pkgdir/usr/share/polkit-1/rules.d/lokinet.rules"
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 33ed6109a44d28d79be50f399c0645e9d1ff6cf7
