@@ -174,7 +174,10 @@ namespace llarp
       if (m_State == State::Ready)
         m_Parent->UnmapAddr(m_RemoteAddr);
       m_State = State::Closed;
+      if (m_SentClosed.test_and_set())
+        return;
       EncryptAndSend(std::move(close_msg));
+
       LogInfo(m_Parent->PrintableName(), " closing connection to ", m_RemoteAddr);
     }
 
@@ -338,7 +341,7 @@ namespace llarp
     bool
     Session::TimedOut(llarp_time_t now) const
     {
-      if (m_State == State::Ready || m_State == State::LinkIntro)
+      if (m_State == State::Ready)
       {
         return now > m_LastRX
             && now - m_LastRX
@@ -768,7 +771,7 @@ namespace llarp
       pos += sizeof(rxid);
       auto p2 = pos + ShortHash::SIZE;
       assert(p2 == data.data() + XMITOverhead);
-      LogTrace("rxid=", rxid, " sz=", sz, " h=", oxenmq::to_hex(pos, p2), " from ", m_RemoteAddr);
+      LogTrace("rxid=", rxid, " sz=", sz, " h=", oxenc::to_hex(pos, p2), " from ", m_RemoteAddr);
       m_LastRX = m_Parent->Now();
       {
         // check for replay

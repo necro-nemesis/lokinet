@@ -5,8 +5,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Has to be set before `project()`, and ignored on non-macos:
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.12 CACHE STRING "macOS deployment target (Apple clang only)")
 
+option(BUILD_DAEMON "build lokinet daemon and associated utils" ON)
+
+
 set(LANGS C CXX)
-if(APPLE)
+if(APPLE AND BUILD_DAEMON)
   set(LANGS ${LANGS} OBJC Swift)
 endif()
 
@@ -43,6 +46,12 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
+set(DEFAULT_WITH_BOOTSTRAP ON)
+if(APPLE)
+  set(DEFAULT_WITH_BOOTSTRAP OFF)
+endif()
+
+
 # Core options
 option(USE_AVX2 "enable avx2 code" OFF)
 option(USE_NETNS "enable networking namespace support. Linux only" OFF)
@@ -57,11 +66,15 @@ option(WITH_COVERAGE "generate coverage data" OFF)
 option(USE_SHELLHOOKS "enable shell hooks on compile time (dangerous)" OFF)
 option(WARNINGS_AS_ERRORS "treat all warnings as errors. turn off for development, on for release" OFF)
 option(TRACY_ROOT "include tracy profiler source" OFF)
-option(WITH_TESTS "build unit tests" ON)
+option(WITH_TESTS "build unit tests" OFF)
 option(WITH_HIVE "build simulation stubs" OFF)
 option(BUILD_PACKAGE "builds extra components for making an installer (with 'make package')" OFF)
+option(WITH_BOOTSTRAP "build lokinet-bootstrap tool" ${DEFAULT_WITH_BOOTSTRAP})
 
 include(cmake/enable_lto.cmake)
+
+option(CROSS_PLATFORM "cross compiler platform" "Linux")
+option(CROSS_PREFIX "toolchain cross compiler prefix" "")
 
 option(BUILD_STATIC_DEPS "Download, build, and statically link against core dependencies" OFF)
 option(STATIC_LINK "link statically against dependencies" ${BUILD_STATIC_DEPS})
@@ -95,7 +108,6 @@ include(cmake/target_link_libraries_system.cmake)
 include(cmake/add_import_library.cmake)
 include(cmake/add_log_tag.cmake)
 include(cmake/libatomic.cmake)
-include(cmake/link_dep_libs.cmake)
 
 if (STATIC_LINK)
   set(CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_STATIC_LIBRARY_SUFFIX})
@@ -170,19 +182,35 @@ if(NOT TARGET sodium)
   export(TARGETS sodium NAMESPACE sodium:: FILE sodium-exports.cmake)
 endif()
 
+option(FORCE_OXENC_SUBMODULE "force using oxen-encoding submodule" OFF)
+if(NOT FORCE_OXENC_SUBMODULE)
+  pkg_check_modules(OXENC liboxenc>=1.0.1 IMPORTED_TARGET)
+endif()
+
+if(OXENC_FOUND)
+  if(NOT TARGET PkgConfig::OXENC AND CMAKE_VERSION VERSION_LESS "3.21")
+    # Work around cmake bug 22180 (PkgConfig::OXENC not set if no flags needed):
+    add_library(_empty_oxenc INTERFACE)
+    add_library(oxenc::oxenc ALIAS _empty_oxenc)
+  else()
+    add_library(oxenc::oxenc ALIAS PkgConfig::OXENC)
+  endif()
+  message(STATUS "Found system liboxenc ${OXENC_VERSION}")
+else()
+  message(STATUS "using oxen-encoding submodule")
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/oxen-encoding)
+endif()
+
 option(FORCE_OXENMQ_SUBMODULE "force using oxenmq submodule" OFF)
 if(NOT FORCE_OXENMQ_SUBMODULE)
-  pkg_check_modules(OXENMQ liboxenmq>=1.2.4)
+  pkg_check_modules(OXENMQ liboxenmq>=1.2.4 IMPORTED_TARGET)
 endif()
 if(OXENMQ_FOUND)
-  add_library(oxenmq INTERFACE)
-  link_dep_libs(oxenmq INTERFACE "${OXENMQ_LIBRARY_DIRS}" ${OXENMQ_LIBRARIES})
-  target_include_directories(oxenmq INTERFACE ${OXENMQ_INCLUDE_DIRS})
-  add_library(oxenmq::oxenmq ALIAS oxenmq)
+  add_library(oxenmq::oxenmq ALIAS PkgConfig::OXENMQ)
   message(STATUS "Found system liboxenmq ${OXENMQ_VERSION}")
 else()
   message(STATUS "using oxenmq submodule")
-  add_subdirectory(${CMAKE_SOURCE_DIR}/external/oxen-mq)
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/oxen-mq)
 endif()
 
 
@@ -327,8 +355,9 @@ endif()
 
 add_subdirectory(crypto)
 add_subdirectory(llarp)
-add_subdirectory(daemon)
-
+if(BUILD_DAEMON)
+  add_subdirectory(daemon)
+endif()
 
 if(WITH_HIVE)
   add_subdirectory(pybind)

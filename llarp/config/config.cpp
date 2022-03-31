@@ -546,6 +546,17 @@ namespace llarp
             "configuration manually."},
         AssignmentAcceptor(m_EnableRoutePoker));
 
+    conf.defineOption<bool>(
+        "network",
+        "blackhole-routes",
+        ClientOnly,
+        Default{true},
+        Comment{
+            "Enable / disable route configuration blackholes.",
+            "When enabled lokinet will drop ip4 and ip6 not included in exit config.",
+            "Enabled by default."},
+        AssignmentAcceptor(m_BlackholeRoutes));
+
     conf.defineOption<std::string>(
         "network",
         "ifname",
@@ -729,7 +740,7 @@ namespace llarp
 #endif
 
     // Default, but if we get any upstream (including upstream=, i.e. empty string) we clear it
-    constexpr Default DefaultUpstreamDNS{"1.1.1.1"};
+    constexpr Default DefaultUpstreamDNS{"9.9.9.10"};
     m_upstreamDNS.emplace_back(DefaultUpstreamDNS.val);
     if (!m_upstreamDNS.back().getPort())
       m_upstreamDNS.back().setPort(53);

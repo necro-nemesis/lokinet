@@ -4,6 +4,7 @@
 #include <llarp/config/config.hpp>
 #include <llarp/constants/proto.hpp>
 #include <llarp/constants/files.hpp>
+#include <llarp/constants/time.hpp>
 #include <llarp/crypto/crypto_libsodium.hpp>
 #include <llarp/crypto/crypto.hpp>
 #include <llarp/dht/context.hpp>
@@ -94,18 +95,17 @@ namespace llarp
   util::StatusObject
   Router::ExtractStatus() const
   {
-    if (_running)
-    {
-      return util::StatusObject{
-          {"running", true},
-          {"numNodesKnown", _nodedb->NumLoaded()},
-          {"dht", _dht->impl->ExtractStatus()},
-          {"services", _hiddenServiceContext.ExtractStatus()},
-          {"exit", _exitContext.ExtractStatus()},
-          {"links", _linkManager.ExtractStatus()},
-          {"outboundMessages", _outboundMessageHandler.ExtractStatus()}};
-    }
-    return util::StatusObject{{"running", false}};
+    if (not _running)
+      util::StatusObject{{"running", false}};
+
+    return util::StatusObject{
+        {"running", true},
+        {"numNodesKnown", _nodedb->NumLoaded()},
+        {"dht", _dht->impl->ExtractStatus()},
+        {"services", _hiddenServiceContext.ExtractStatus()},
+        {"exit", _exitContext.ExtractStatus()},
+        {"links", _linkManager.ExtractStatus()},
+        {"outboundMessages", _outboundMessageHandler.ExtractStatus()}};
   }
 
   util::StatusObject
@@ -115,6 +115,7 @@ namespace llarp
       return util::StatusObject{{"running", false}};
 
     auto services = _hiddenServiceContext.ExtractStatus();
+
     auto link_types = _linkManager.ExtractStatus();
 
     uint64_t tx_rate = 0;
@@ -138,45 +139,69 @@ namespace llarp
     // Compute all stats on all path builders on the default endpoint
     // Merge snodeSessions, remoteSessions and default into a single array
     std::vector<nlohmann::json> builders;
-    auto snode_sessions = services["default"]["snodeSessions"];
-    for (const auto& session : snode_sessions)
-      builders.push_back(session["buildStats"]);
 
-    auto remote_sessions = services["default"]["remoteSessions"];
-    for (const auto& session : remote_sessions)
-      builders.push_back(session["buildStats"]);
+    if (services.is_object())
+    {
+      const auto& serviceDefault = services.at("default");
+      builders.push_back(serviceDefault);
 
-    builders.push_back(services["default"]["buildStats"]);
+      auto snode_sessions = serviceDefault.at("snodeSessions");
+      for (const auto& session : snode_sessions)
+        builders.push_back(session);
+
+      auto remote_sessions = serviceDefault.at("remoteSessions");
+      for (const auto& session : remote_sessions)
+        builders.push_back(session);
+    }
 
     // Iterate over all items on this array to build the global pathStats
-    uint64_t paths = 0;
+    uint64_t pathsCount = 0;
     uint64_t success = 0;
     uint64_t attempts = 0;
     for (const auto& builder : builders)
     {
       if (builder.is_null())
         continue;
-      if (builder["length"].is_number())
-        paths += builder["length"].get<uint64_t>();
-      if (builder["success"].is_number())
-        success += builder["success"].get<uint64_t>();
-      if (builder["attempts"].is_number())
-        attempts += builder["attempts"].get<uint64_t>();
+
+      const auto& paths = builder.at("paths");
+      if (paths.is_array())
+      {
+        for (const auto& [key, value] : paths.items())
+        {
+          if (value.is_object() && value.at("status").is_string()
+              && value.at("status") == "established")
+            pathsCount++;
+        }
+      }
+
+      const auto& buildStats = builder.at("buildStats");
+      if (buildStats.is_null())
+        continue;
+
+      success += buildStats.at("success").get<uint64_t>();
+      attempts += buildStats.at("attempts").get<uint64_t>();
     }
     double ratio = static_cast<double>(success) / (attempts + 1);
 
-    return util::StatusObject{
+    util::StatusObject stats{
         {"running", true},
-        {"authCodes", services["default"]["authCodes"]},
-        {"exitMap", services["default"]["exitMap"]},
-        {"lokiAddress", services["default"]["identity"]},
-        {"numPathsBuilt", paths},
+        {"version", llarp::VERSION_FULL},
+        {"uptime", to_json(Uptime())},
+        {"numPathsBuilt", pathsCount},
         {"numPeersConnected", peers},
         {"numRoutersKnown", _nodedb->NumLoaded()},
         {"ratio", ratio},
         {"txRate", tx_rate},
         {"rxRate", rx_rate},
     };
+
+    if (services.is_object())
+    {
+      stats["authCodes"] = services["default"]["authCodes"];
+      stats["exitMap"] = services["default"]["exitMap"];
+      stats["lokiAddress"] = services["default"]["identity"];
+    }
+    return stats;
   }
 
   bool
@@ -418,6 +443,8 @@ namespace llarp
       LogError("RC is invalid, not saving");
       return false;
     }
+    if (m_isServiceNode)
+      _nodedb->Put(_rc);
     QueueDiskIO([&]() { HandleSaveRC(); });
     return true;
   }
@@ -807,6 +834,12 @@ namespace llarp
       return;
     // LogDebug("tick router");
     const auto now = Now();
+    if (const auto delta = now - _lastTick; _lastTick != 0s and delta > TimeskipDetectedDuration)
+    {
+      // we detected a time skip into the futre, thaw the network
+      LogWarn("Timeskip of ", delta, " detected. Resetting network state");
+      Thaw();
+    }
 
 #if defined(WITH_SYSTEMD)
     {
@@ -822,12 +855,18 @@ namespace llarp
       else
       {
         ss << " client | known/connected: " << nodedb()->NumLoaded() << "/"
-           << NumberOfConnectedRouters() << " | path success: ";
-        hiddenServiceContext().ForEachService([&ss](const auto& name, const auto& ep) {
-          ss << " [" << name << " " << std::setprecision(4)
-             << (100.0 * ep->CurrentBuildStats().SuccessRatio()) << "%]";
-          return true;
-        });
+           << NumberOfConnectedRouters();
+        if (auto ep = hiddenServiceContext().GetDefault())
+        {
+          ss << " | paths/endpoints " << pathContext().CurrentOwnedPaths() << "/"
+             << ep->UniqueEndpoints();
+          auto success_rate = ep->CurrentBuildStats().SuccessRatio();
+          if (success_rate < 0.5)
+          {
+            ss << " [ !!! Low Build Success Rate (" << std::setprecision(4)
+               << (100.0 * success_rate) << "%) !!! ] ";
+          }
+        };
       }
       const auto status = ss.str();
       ::sd_notify(0, status.c_str());

@@ -54,6 +54,7 @@ add_library(lokinet-platform
   net/net_int.cpp
   net/sock_addr.cpp
   vpn/packet_router.cpp
+  vpn/egres_packet_router.cpp
   vpn/platform.cpp
 )
 
@@ -241,7 +242,7 @@ if(WITH_HIVE)
   )
 endif()
 
-target_link_libraries(liblokinet PUBLIC cxxopts lokinet-platform lokinet-util lokinet-cryptography sqlite_orm ngtcp2)
+target_link_libraries(liblokinet PUBLIC cxxopts lokinet-platform lokinet-util lokinet-cryptography sqlite_orm ngtcp2_static)
 target_link_libraries(liblokinet PRIVATE libunbound)
 
 
