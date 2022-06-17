@@ -126,32 +126,23 @@ namespace llarp
             "provided the public-port option must also be specified.",
         },
         [this](std::string arg) {
-          if (not arg.empty())
-          {
-            llarp::LogInfo("public ip ", arg, " size ", arg.size());
+          if (arg.empty())
+            return;
+          nuint32_t addr{};
+          if (not addr.FromString(arg))
+            throw std::invalid_argument{stringify(arg, " is not a valid IPv4 address")};
 
-            if (arg.size() > 15)
-              throw std::invalid_argument(stringify("Not a valid IPv4 addr: ", arg));
+          if (IsIPv4Bogon(addr))
+            throw std::invalid_argument{
+                stringify(addr, " looks like it is not a publicly routable ip address")};
 
-            m_publicAddress.setAddress(arg);
-          }
+          m_PublicIP = addr;
         });
 
-    conf.defineOption<std::string>("router", "public-address", Hidden, [this](std::string arg) {
-      if (not arg.empty())
-      {
-        llarp::LogWarn(
-            "*** WARNING: The config option [router]:public-address=",
-            arg,
-            " is deprecated, use public-ip=",
-            arg,
-            " instead to avoid this warning and avoid future configuration problems.");
-
-        if (arg.size() > 15)
-          throw std::invalid_argument(stringify("Not a valid IPv4 addr: ", arg));
-
-        m_publicAddress.setAddress(arg);
-      }
+    conf.defineOption<std::string>("router", "public-address", Hidden, [](std::string) {
+      throw std::invalid_argument{
+          "[router]:public-address option no longer supported, use [router]:public-ip and "
+          "[router]:public-port instead"};
     });
 
     conf.defineOption<int>(
@@ -166,8 +157,7 @@ namespace llarp
         [this](int arg) {
           if (arg <= 0 || arg > std::numeric_limits<uint16_t>::max())
             throw std::invalid_argument("public-port must be >= 0 and <= 65536");
-
-          m_publicAddress.setPort(arg);
+          m_PublicPort = ToNet(huint16_t{static_cast<uint16_t>(arg)});
         });
 
     conf.defineOption<int>(
@@ -317,7 +307,7 @@ namespace llarp
         ClientOnly,
         Comment{
             "Set the endpoint authentication mechanism.",
-            "none/whitelist/lmq",
+            "none/whitelist/lmq/file",
         },
         [this](std::string arg) {
           if (arg.empty())
@@ -365,6 +355,42 @@ namespace llarp
             throw std::invalid_argument(stringify("bad loki address: ", arg));
           m_AuthWhitelist.emplace(std::move(addr));
         });
+
+    conf.defineOption<fs::path>(
+        "network",
+        "auth-file",
+        ClientOnly,
+        MultiValue,
+        Comment{
+            "Read auth tokens from file to accept endpoint auth",
+            "Can be provided multiple times",
+        },
+        [this](fs::path arg) {
+          if (not fs::exists(arg))
+            throw std::invalid_argument{
+                stringify("cannot load auth file ", arg, " as it does not seem to exist")};
+          m_AuthFiles.emplace(std::move(arg));
+        });
+    conf.defineOption<std::string>(
+        "network",
+        "auth-file-type",
+        ClientOnly,
+        Comment{
+            "How to interpret the contents of an auth file.",
+            "Possible values: hashes, plaintext",
+        },
+        [this](std::string arg) { m_AuthFileType = service::ParseAuthFileType(std::move(arg)); });
+
+    conf.defineOption<std::string>(
+        "network",
+        "auth-static",
+        ClientOnly,
+        MultiValue,
+        Comment{
+            "Manually add a static auth code to accept for endpoint auth",
+            "Can be provided multiple times",
+        },
+        [this](std::string arg) { m_AuthStaticTokens.emplace(std::move(arg)); });
 
     conf.defineOption<bool>(
         "network",
