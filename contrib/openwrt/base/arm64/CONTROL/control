@@ -1,6 +1,6 @@
 Package: lokinet
-Version: 0.9.9~1
+Version: 0.9.10~1
 Architecture: aarch64_generic
-Maintainer: Jeff Becker (probably not evil) jeff@i2p.rocks
+Maintainer: necro_nemesis necro_nemesis@hotmail.com
 Description: IP packet onion router
 Depends: bash, curl
