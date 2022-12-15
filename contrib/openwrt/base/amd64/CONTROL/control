@@ -1,5 +1,5 @@
 Package: lokinet
-Version: 0.9.10~1
+Version: 0.9.11~1
 Architecture: x86_64
 Maintainer: necro_nemesis necro_nemesis@hotmail.com
 Description: IP packet onion router
